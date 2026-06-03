@@ -101,38 +101,23 @@ export const walletsTable = pgTable(
   'wallets',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-
     userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
         onDelete: 'cascade',
       }),
-
     name: text('name').notNull(),
-
     type: walletTypeEnum('type').notNull(),
-
-    initialBalanceInCents: integer('initial_balance_in_cents')
-      .default(0)
-      .notNull(),
-
     color: text('color'),
-
-    icon: text('icon'),
-
     isActive: boolean('is_active').default(true).notNull(),
-
     createdAt: timestamp('created_at').defaultNow().notNull(),
-
     updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
     userIdIdx: index('wallets_user_id_idx').on(table.userId),
-
     typeIdx: index('wallets_type_idx').on(table.type),
-
     activeIdx: index('wallets_active_idx').on(table.isActive),
   }),
 );
@@ -144,7 +129,6 @@ export const walletsTableRelations = relations(
       fields: [walletsTable.userId],
       references: [usersTable.id],
     }),
-
     transactions: many(transactionsTable),
   }),
 );

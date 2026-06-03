@@ -69,8 +69,6 @@ const UpsertCategoryForm = ({
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-
     upsertCategoryAction.execute({ ...data, id: category?.id });
   };
 
