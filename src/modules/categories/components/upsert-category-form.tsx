@@ -78,7 +78,7 @@ const UpsertCategoryForm = ({
         <DialogHeader>
           <DialogTitle>{category ? 'Editar' : 'Criar'} categoria</DialogTitle>
           <DialogDescription>
-            {category ? 'Edite' : 'Crie'} uma nova categoria
+            {category ? 'Edite a' : 'Crie uma nova'} categoria
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -104,7 +104,7 @@ const UpsertCategoryForm = ({
               )}
             />
           </FieldGroup>
-          <DialogFooter>
+          <DialogFooter className="mt-5">
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>

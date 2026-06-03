@@ -1,23 +1,23 @@
-import { ArrowLeft, CalendarCheck, Shield } from "lucide-react";
-import { headers } from "next/headers";
-import Image from "next/image";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { ArrowLeft, CalendarCheck, Shield } from 'lucide-react';
+import { headers } from 'next/headers';
+import Image from 'next/image';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { auth } from "@/lib/auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { auth } from '@/lib/auth';
 
-import SignInForm from "./_components/sign-in-form";
-import SignUpForm from "./_components/sign-up-form";
+import SignInForm from './_components/sign-in-form';
+import SignUpForm from './_components/sign-up-form';
 
 const AuthenticationPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  // if (session?.user) {
-  //   redirect("/dashboard");
-  // }
+  if (session?.user) {
+    redirect('/dashboard');
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -113,9 +113,7 @@ const AuthenticationPage = async () => {
 
           {/* Título */}
           <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Bem-vindo!
-            </h2>
+            <h2 className="text-2xl font-bold tracking-tight">Bem-vindo!</h2>
             <p className="text-muted-foreground">
               Entre na sua conta ou crie uma nova
             </p>
@@ -124,10 +122,16 @@ const AuthenticationPage = async () => {
           {/* Tabs com formulários */}
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="mb-6 grid w-full grid-cols-2">
-              <TabsTrigger value="login" className="text-sm font-medium cursor-pointer">
+              <TabsTrigger
+                value="login"
+                className="cursor-pointer text-sm font-medium"
+              >
                 Entrar
               </TabsTrigger>
-              <TabsTrigger value="register" className="text-sm font-medium cursor-pointer">
+              <TabsTrigger
+                value="register"
+                className="cursor-pointer text-sm font-medium"
+              >
                 Criar conta
               </TabsTrigger>
             </TabsList>
@@ -141,17 +145,17 @@ const AuthenticationPage = async () => {
 
           {/* Termos */}
           <p className="text-muted-foreground text-center text-xs">
-            Ao continuar, você concorda com nossos{" "}
+            Ao continuar, você concorda com nossos{' '}
             <Link
               href="#"
-              className="hover:text-primary underline underline-offset-4 cursor-pointer"
+              className="hover:text-primary cursor-pointer underline underline-offset-4"
             >
               Termos de Serviço
-            </Link>{" "}
-            e{" "}
+            </Link>{' '}
+            e{' '}
             <Link
               href="#"
-              className="hover:text-primary underline underline-offset-4 cursor-pointer"
+              className="hover:text-primary cursor-pointer underline underline-offset-4"
             >
               Política de Privacidade
             </Link>

@@ -1,7 +1,9 @@
 'use client';
 
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -25,6 +27,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { walletsTable } from '@/infrastructure/db/schema';
 
+import { deleteWallet } from '../actions/delete-wallet';
 import { walletTypeLabels } from '../constants/wallet-types';
 import UpsertWalletForm from './upsert-wallet-form';
 
@@ -35,8 +38,18 @@ interface WalletCardProps {
 const WalletCard = ({ wallet }: WalletCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleDeleteWalletClick = () => {
-    console.log(wallet.id);
+  const deleteWalletAction = useAction(deleteWallet, {
+    onSuccess: () => {
+      toast.success('Carteira excluída com sucesso');
+    },
+    onError: () => {
+      toast.error('Erro ao excluir carteira');
+    },
+  });
+
+  const handleDeleteWalletClick = async () => {
+    if (!wallet) return;
+    deleteWalletAction.execute({ id: wallet.id });
   };
 
   return (
@@ -107,7 +120,10 @@ const WalletCard = ({ wallet }: WalletCardProps) => {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
 
-                      <AlertDialogAction onClick={handleDeleteWalletClick}>
+                      <AlertDialogAction
+                        onClick={handleDeleteWalletClick}
+                        className="bg-red-900 text-white hover:bg-red-700"
+                      >
                         Excluir
                       </AlertDialogAction>
                     </AlertDialogFooter>

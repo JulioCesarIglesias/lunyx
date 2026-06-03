@@ -108,7 +108,10 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
 
-                      <AlertDialogAction onClick={handleDeleteCategoryClick}>
+                      <AlertDialogAction
+                        onClick={handleDeleteCategoryClick}
+                        className="bg-red-900 text-white hover:bg-red-700"
+                      >
                         Excluir
                       </AlertDialogAction>
                     </AlertDialogFooter>
