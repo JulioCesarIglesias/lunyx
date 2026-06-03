@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from 'drizzle-orm';
 import {
   boolean,
   index,
@@ -9,52 +9,46 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
-} from "drizzle-orm/pg-core";
+} from 'drizzle-orm/pg-core';
 
 /* =========================================================
    ENUMS
 ========================================================= */
 
-export const walletTypeEnum = pgEnum("wallet_type", [
-  "bank",
-  "cash",
-  "credit_card",
-  "digital_account",
-  "investment",
+export const walletTypeEnum = pgEnum('wallet_type', [
+  'bank',
+  'cash',
+  'credit_card',
+  'digital_account',
+  'investment',
 ]);
 
-export const categoryTypeEnum = pgEnum("category_type", [
-  "income",
-  "expense",
-  "both",
+export const transactionTypeEnum = pgEnum('transaction_type', [
+  'income',
+  'expense',
+  'transfer',
 ]);
 
-export const transactionTypeEnum = pgEnum("transaction_type", [
-  "income",
-  "expense",
-  "transfer",
+export const paymentMethodEnum = pgEnum('payment_method', [
+  'cash',
+  'pix',
+  'credit_card',
+  'debit_card',
+  'bank_transfer',
+  'boleto',
 ]);
 
-export const paymentMethodEnum = pgEnum("payment_method", [
-  "cash",
-  "pix",
-  "credit_card",
-  "debit_card",
-  "bank_transfer",
-  "boleto",
+export const frequencyTypeEnum = pgEnum('frequency_type', [
+  'one_time',
+  'installment',
+  'recurring',
 ]);
 
-export const frequencyTypeEnum = pgEnum("frequency_type", [
-  "one_time",
-  "installment",
-  "recurring",
-]);
-
-export const transactionStatusEnum = pgEnum("transaction_status", [
-  "pending",
-  "paid",
-  "overdue",
-  "canceled",
+export const transactionStatusEnum = pgEnum('transaction_status', [
+  'pending',
+  'paid',
+  'overdue',
+  'canceled',
 ]);
 
 /* =========================================================
@@ -62,101 +56,84 @@ export const transactionStatusEnum = pgEnum("transaction_status", [
 ========================================================= */
 
 export const usersTable = pgTable(
-  "users",
+  'users',
   {
-    id: text("id").primaryKey(),
+    id: text('id').primaryKey(),
 
-    name: text("name").notNull(),
+    name: text('name').notNull(),
 
-    email: text("email").notNull().unique(),
+    email: text('email').notNull().unique(),
 
-    emailVerified: boolean("email_verified").notNull(),
+    emailVerified: boolean('email_verified').notNull(),
 
-    image: text("image"),
+    image: text('image'),
 
-    stripeCustomerId: text("stripe_customer_id"),
+    stripeCustomerId: text('stripe_customer_id'),
 
-    stripeSubscriptionId: text("stripe_subscription_id"),
+    stripeSubscriptionId: text('stripe_subscription_id'),
 
-    plan: text("plan"),
+    plan: text('plan'),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    emailIdx: uniqueIndex("users_email_idx").on(table.email),
+    emailIdx: uniqueIndex('users_email_idx').on(table.email),
   }),
 );
 
-export const usersTableRelations = relations(
-  usersTable,
-  ({ many }) => ({
-    wallets: many(walletsTable),
+export const usersTableRelations = relations(usersTable, ({ many }) => ({
+  wallets: many(walletsTable),
 
-    categories: many(categoriesTable),
+  categories: many(categoriesTable),
 
-    transactions: many(transactionsTable),
-  }),
-);
+  transactions: many(transactionsTable),
+}));
 
 /* =========================================================
    WALLETS
 ========================================================= */
 
 export const walletsTable = pgTable(
-  "wallets",
+  'wallets',
   {
-    id: uuid("id").defaultRandom().primaryKey(),
+    id: uuid('id').defaultRandom().primaryKey(),
 
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
 
-    name: text("name").notNull(),
+    name: text('name').notNull(),
 
-    type: walletTypeEnum("type").notNull(),
+    type: walletTypeEnum('type').notNull(),
 
-    initialBalanceInCents: integer(
-      "initial_balance_in_cents",
-    )
+    initialBalanceInCents: integer('initial_balance_in_cents')
       .default(0)
       .notNull(),
 
-    color: text("color"),
+    color: text('color'),
 
-    icon: text("icon"),
+    icon: text('icon'),
 
-    isActive: boolean("is_active")
-      .default(true)
-      .notNull(),
+    isActive: boolean('is_active').default(true).notNull(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("wallets_user_id_idx").on(
-      table.userId,
-    ),
+    userIdIdx: index('wallets_user_id_idx').on(table.userId),
 
-    typeIdx: index("wallets_type_idx").on(
-      table.type,
-    ),
+    typeIdx: index('wallets_type_idx').on(table.type),
 
-    activeIdx: index("wallets_active_idx").on(
-      table.isActive,
-    ),
+    activeIdx: index('wallets_active_idx').on(table.isActive),
   }),
 );
 
@@ -177,46 +154,31 @@ export const walletsTableRelations = relations(
 ========================================================= */
 
 export const categoriesTable = pgTable(
-  "categories",
+  'categories',
   {
-    id: uuid("id").defaultRandom().primaryKey(),
+    id: uuid('id').defaultRandom().primaryKey(),
 
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
 
-    name: text("name").notNull(),
+    name: text('name').notNull(),
 
-    type: categoryTypeEnum("type")
-      .default("expense")
-      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-    color: text("color"),
-
-    icon: text("icon"),
-
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
-
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("categories_user_id_idx").on(
+    userIdIdx: index('categories_user_id_idx').on(table.userId),
+
+    userNameUniqueIdx: uniqueIndex('categories_user_name_unique_idx').on(
       table.userId,
+      table.name,
     ),
-
-    typeIdx: index("categories_type_idx").on(
-      table.type,
-    ),
-
-    userNameUniqueIdx: uniqueIndex(
-      "categories_user_name_unique_idx",
-    ).on(table.userId, table.name),
   }),
 );
 
@@ -237,105 +199,74 @@ export const categoriesTableRelations = relations(
 ========================================================= */
 
 export const transactionsTable = pgTable(
-  "transactions",
+  'transactions',
   {
-    id: uuid("id").defaultRandom().primaryKey(),
+    id: uuid('id').defaultRandom().primaryKey(),
 
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
 
-    walletId: uuid("wallet_id")
+    walletId: uuid('wallet_id')
       .notNull()
       .references(() => walletsTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
 
-    categoryId: uuid("category_id").references(
-      () => categoriesTable.id,
-      {
-        onDelete: "set null",
-      },
-    ),
+    categoryId: uuid('category_id').references(() => categoriesTable.id, {
+      onDelete: 'set null',
+    }),
 
-    title: text("title").notNull(),
+    title: text('title').notNull(),
 
-    description: text("description"),
+    description: text('description'),
 
-    transactionType:
-      transactionTypeEnum(
-        "transaction_type",
-      ).notNull(),
+    transactionType: transactionTypeEnum('transaction_type').notNull(),
 
-    paymentMethod:
-      paymentMethodEnum(
-        "payment_method",
-      ).notNull(),
+    paymentMethod: paymentMethodEnum('payment_method').notNull(),
 
-    frequencyType:
-      frequencyTypeEnum(
-        "frequency_type",
-      )
-        .default("one_time")
-        .notNull(),
-
-    amountTotalInCents: integer(
-      "amount_total_in_cents",
-    ).notNull(),
-
-    installments: integer("installments")
-      .default(1)
+    frequencyType: frequencyTypeEnum('frequency_type')
+      .default('one_time')
       .notNull(),
 
-    startDate: timestamp("start_date")
-      .notNull(),
+    amountTotalInCents: integer('amount_total_in_cents').notNull(),
 
-    isActive: boolean("is_active")
-      .default(true)
-      .notNull(),
+    installments: integer('installments').default(1).notNull(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    startDate: timestamp('start_date').notNull(),
 
-    updatedAt: timestamp("updated_at")
+    isActive: boolean('is_active').default(true).notNull(),
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("transactions_user_id_idx").on(
-      table.userId,
+    userIdIdx: index('transactions_user_id_idx').on(table.userId),
+
+    walletIdIdx: index('transactions_wallet_id_idx').on(table.walletId),
+
+    categoryIdIdx: index('transactions_category_id_idx').on(table.categoryId),
+
+    transactionTypeIdx: index('transactions_transaction_type_idx').on(
+      table.transactionType,
     ),
 
-    walletIdIdx: index(
-      "transactions_wallet_id_idx",
-    ).on(table.walletId),
+    paymentMethodIdx: index('transactions_payment_method_idx').on(
+      table.paymentMethod,
+    ),
 
-    categoryIdIdx: index(
-      "transactions_category_id_idx",
-    ).on(table.categoryId),
+    frequencyTypeIdx: index('transactions_frequency_type_idx').on(
+      table.frequencyType,
+    ),
 
-    transactionTypeIdx: index(
-      "transactions_transaction_type_idx",
-    ).on(table.transactionType),
+    startDateIdx: index('transactions_start_date_idx').on(table.startDate),
 
-    paymentMethodIdx: index(
-      "transactions_payment_method_idx",
-    ).on(table.paymentMethod),
-
-    frequencyTypeIdx: index(
-      "transactions_frequency_type_idx",
-    ).on(table.frequencyType),
-
-    startDateIdx: index(
-      "transactions_start_date_idx",
-    ).on(table.startDate),
-
-    activeIdx: index(
-      "transactions_active_idx",
-    ).on(table.isActive),
+    activeIdx: index('transactions_active_idx').on(table.isActive),
   }),
 );
 
@@ -357,9 +288,7 @@ export const transactionsTableRelations = relations(
       references: [categoriesTable.id],
     }),
 
-    occurrences: many(
-      transactionOccurrencesTable,
-    ),
+    occurrences: many(transactionOccurrencesTable),
   }),
 );
 
@@ -367,232 +296,170 @@ export const transactionsTableRelations = relations(
    TRANSACTION OCCURRENCES
 ========================================================= */
 
-export const transactionOccurrencesTable =
-  pgTable(
-    "transaction_occurrences",
-    {
-      id: uuid("id")
-        .defaultRandom()
-        .primaryKey(),
+export const transactionOccurrencesTable = pgTable(
+  'transaction_occurrences',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
 
-      transactionId: uuid("transaction_id")
-        .notNull()
-        .references(
-          () => transactionsTable.id,
-          {
-            onDelete: "cascade",
-          },
-        ),
+    transactionId: uuid('transaction_id')
+      .notNull()
+      .references(() => transactionsTable.id, {
+        onDelete: 'cascade',
+      }),
 
-      occurrenceDate: timestamp(
-        "occurrence_date",
-      ).notNull(),
+    occurrenceDate: timestamp('occurrence_date').notNull(),
 
-      dueDate: timestamp("due_date")
-        .notNull(),
+    dueDate: timestamp('due_date').notNull(),
 
-      amountInCents: integer(
-        "amount_in_cents",
-      ).notNull(),
+    amountInCents: integer('amount_in_cents').notNull(),
 
-      installmentNumber: integer(
-        "installment_number",
-      ),
+    installmentNumber: integer('installment_number'),
 
-      installmentTotal: integer(
-        "installment_total",
-      ),
+    installmentTotal: integer('installment_total'),
 
-      status:
-        transactionStatusEnum(
-          "status",
-        )
-          .default("pending")
-          .notNull(),
+    status: transactionStatusEnum('status').default('pending').notNull(),
 
-      paidAt: timestamp("paid_at"),
+    paidAt: timestamp('paid_at'),
 
-      notes: text("notes"),
+    notes: text('notes'),
 
-      isDeleted: boolean("is_deleted")
-        .default(false)
-        .notNull(),
+    isDeleted: boolean('is_deleted').default(false).notNull(),
 
-      deletedAt: timestamp("deleted_at"),
+    deletedAt: timestamp('deleted_at'),
 
-      createdAt: timestamp("created_at")
-        .defaultNow()
-        .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-      updatedAt: timestamp("updated_at")
-        .defaultNow()
-        .$onUpdate(() => new Date()),
-    },
-    (table) => ({
-      transactionIdIdx: index(
-        "transaction_occurrences_transaction_id_idx",
-      ).on(table.transactionId),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => ({
+    transactionIdIdx: index('transaction_occurrences_transaction_id_idx').on(
+      table.transactionId,
+    ),
 
-      dueDateIdx: index(
-        "transaction_occurrences_due_date_idx",
-      ).on(table.dueDate),
+    dueDateIdx: index('transaction_occurrences_due_date_idx').on(table.dueDate),
 
-      occurrenceDateIdx: index(
-        "transaction_occurrences_occurrence_date_idx",
-      ).on(table.occurrenceDate),
+    occurrenceDateIdx: index('transaction_occurrences_occurrence_date_idx').on(
+      table.occurrenceDate,
+    ),
 
-      statusIdx: index(
-        "transaction_occurrences_status_idx",
-      ).on(table.status),
+    statusIdx: index('transaction_occurrences_status_idx').on(table.status),
 
-      paidAtIdx: index(
-        "transaction_occurrences_paid_at_idx",
-      ).on(table.paidAt),
+    paidAtIdx: index('transaction_occurrences_paid_at_idx').on(table.paidAt),
 
-      deletedIdx: index(
-        "transaction_occurrences_deleted_idx",
-      ).on(table.isDeleted),
+    deletedIdx: index('transaction_occurrences_deleted_idx').on(
+      table.isDeleted,
+    ),
+  }),
+);
+
+export const transactionOccurrencesTableRelations = relations(
+  transactionOccurrencesTable,
+  ({ one }) => ({
+    transaction: one(transactionsTable, {
+      fields: [transactionOccurrencesTable.transactionId],
+      references: [transactionsTable.id],
     }),
-  );
-
-export const transactionOccurrencesTableRelations =
-  relations(
-    transactionOccurrencesTable,
-    ({ one }) => ({
-      transaction: one(
-        transactionsTable,
-        {
-          fields: [
-            transactionOccurrencesTable.transactionId,
-          ],
-          references: [transactionsTable.id],
-        },
-      ),
-    }),
-  );
+  }),
+);
 
 /* =========================================================
    BETTER AUTH TABLES
 ========================================================= */
 
 export const sessionsTable = pgTable(
-  "session",
+  'session',
   {
-    id: text("id").primaryKey(),
+    id: text('id').primaryKey(),
 
-    expiresAt: timestamp("expires_at")
-      .notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
 
-    token: text("token")
-      .notNull()
-      .unique(),
+    token: text('token').notNull().unique(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
 
-    ipAddress: text("ip_address"),
+    ipAddress: text('ip_address'),
 
-    userAgent: text("user_agent"),
+    userAgent: text('user_agent'),
 
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
   },
   (table) => ({
-    tokenIdx: uniqueIndex(
-      "sessions_token_idx",
-    ).on(table.token),
+    tokenIdx: uniqueIndex('sessions_token_idx').on(table.token),
 
-    userIdIdx: index(
-      "sessions_user_id_idx",
-    ).on(table.userId),
+    userIdIdx: index('sessions_user_id_idx').on(table.userId),
   }),
 );
 
 export const accountsTable = pgTable(
-  "account",
+  'account',
   {
-    id: text("id").primaryKey(),
+    id: text('id').primaryKey(),
 
-    accountId: text("account_id")
-      .notNull(),
+    accountId: text('account_id').notNull(),
 
-    providerId: text("provider_id")
-      .notNull(),
+    providerId: text('provider_id').notNull(),
 
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
       .references(() => usersTable.id, {
-        onDelete: "cascade",
+        onDelete: 'cascade',
       }),
 
-    accessToken: text("access_token"),
+    accessToken: text('access_token'),
 
-    refreshToken: text("refresh_token"),
+    refreshToken: text('refresh_token'),
 
-    idToken: text("id_token"),
+    idToken: text('id_token'),
 
-    accessTokenExpiresAt: timestamp(
-      "access_token_expires_at",
-    ),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
 
-    refreshTokenExpiresAt: timestamp(
-      "refresh_token_expires_at",
-    ),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
 
-    scope: text("scope"),
+    scope: text('scope'),
 
-    password: text("password"),
+    password: text('password'),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index(
-      "accounts_user_id_idx",
-    ).on(table.userId),
+    userIdIdx: index('accounts_user_id_idx').on(table.userId),
 
-    providerIdx: index(
-      "accounts_provider_id_idx",
-    ).on(table.providerId),
+    providerIdx: index('accounts_provider_id_idx').on(table.providerId),
   }),
 );
 
 export const verificationsTable = pgTable(
-  "verification",
+  'verification',
   {
-    id: text("id").primaryKey(),
+    id: text('id').primaryKey(),
 
-    identifier: text("identifier")
-      .notNull(),
+    identifier: text('identifier').notNull(),
 
-    value: text("value").notNull(),
+    value: text('value').notNull(),
 
-    expiresAt: timestamp("expires_at")
-      .notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow(),
+    createdAt: timestamp('created_at').defaultNow(),
 
-    updatedAt: timestamp("updated_at")
+    updatedAt: timestamp('updated_at')
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    identifierIdx: index(
-      "verification_identifier_idx",
-    ).on(table.identifier),
+    identifierIdx: index('verification_identifier_idx').on(table.identifier),
   }),
 );

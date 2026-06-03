@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Lock, Mail } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Lock, Mail } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { authClient } from '@/lib/auth-client';
 
 const signInSchema = z.object({
-  email: z.email("Email inválido"),
-  password: z.string().min(6, "Senha inválida"),
+  email: z.email('Email inválido'),
+  password: z.string().min(6, 'Senha inválida'),
 });
 
 type SignInSchema = z.infer<typeof signInSchema>;
@@ -33,8 +33,8 @@ const SignInForm = () => {
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -47,29 +47,26 @@ const SignInForm = () => {
       {
         onSuccess: async () => {
           setIsRedirecting(true);
-          toast.success("Login realizado com sucesso");
+          toast.success('Login realizado com sucesso');
 
-          await router.push("/dashboard");
+          await router.push('/dashboard');
         },
         onError: () => {
-          toast.error("E-mail ou senha inválidos.");
+          toast.error('E-mail ou senha inválidos.');
         },
       },
     );
   };
 
   async function handleGoogleLogin() {
-    console.log("google");
+    console.log('google');
   }
 
   const isLoading = form.formState.isSubmitting || isRedirecting;
 
   return (
     <div className="space-y-6">
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FieldGroup>
           <Controller
             control={form.control}
@@ -127,7 +124,7 @@ const SignInForm = () => {
 
         <Button
           type="submit"
-          className="h-11 w-full font-medium cursor-pointer"
+          className="h-11 w-full cursor-pointer font-medium"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -136,7 +133,7 @@ const SignInForm = () => {
               Entrando...
             </>
           ) : (
-            "Entrar"
+            'Entrar'
           )}
         </Button>
       </form>
@@ -155,7 +152,7 @@ const SignInForm = () => {
 
       <Button
         variant="outline"
-        className="h-11 w-full font-medium cursor-pointer"
+        className="h-11 w-full cursor-pointer font-medium"
         type="button"
         disabled={isLoading}
         onClick={handleGoogleLogin}
@@ -178,11 +175,10 @@ const SignInForm = () => {
             fill="#EA4335"
           />
         </svg>
-
         Continuar com Google
       </Button>
     </div>
   );
-}
+};
 
 export default SignInForm;
