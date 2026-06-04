@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import { categoriesTable, walletsTable } from '@/infrastructure/db/schema';
+import { cn } from '@/lib/utils';
 
 import { TransactionFilters } from '../actions/get-transactions/schema';
 import { filterMonthOptions, getFilterYearOptions } from '../constants/filter-months';
