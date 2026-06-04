@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarCheck, Shield } from 'lucide-react';
+import { ArrowLeft, ChartSpline, PiggyBank, TrendingUp } from 'lucide-react';
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,61 +23,108 @@ const AuthenticationPage = async () => {
     <div className="flex min-h-screen">
       {/* Lado esquerdo - Branding */}
       <div className="bg-primary relative hidden overflow-hidden lg:flex lg:w-1/2">
-        {/* Padrão de fundo decorativo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="border-primary-foreground absolute top-20 left-20 h-72 w-72 rounded-full border" />
-          <div className="border-primary-foreground absolute top-40 left-40 h-96 w-96 rounded-full border" />
-          <div className="border-primary-foreground absolute -right-20 -bottom-20 h-80 w-80 rounded-full border" />
+        {/* Fundo com projeções financeiras */}
+        <div className="absolute inset-0 overflow-hidden">
+          <svg
+            className="absolute inset-0 h-full w-full opacity-20"
+            viewBox="0 0 1000 1000"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0 700 C150 650, 250 500, 400 520 S700 300, 1000 150"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+            />
+
+            <path
+              d="M0 850 C180 800, 350 650, 500 600 S800 450, 1000 250"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              opacity="0.6"
+            />
+
+            <path
+              d="M0 900 C200 850, 350 800, 600 650 S850 500, 1000 350"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              opacity="0.4"
+            />
+          </svg>
+
+          {/* Gradientes decorativos */}
+          <div className="bg-primary-foreground/10 absolute top-0 left-0 h-96 w-96 rounded-full blur-3xl" />
+          <div className="bg-primary-foreground/5 absolute right-0 bottom-0 h-96 w-96 rounded-full blur-3xl" />
         </div>
 
-        <div className="text-primary-foreground relative z-10 flex w-full flex-col justify-between p-12">
+        <div className="text-primary-foreground relative z-20 flex w-full flex-col justify-between p-12">
           {/* Logo e voltar */}
           <div>
-            <Link
+            {/* <Link
               href="/"
               className="text-primary-foreground/80 hover:text-primary-foreground mb-8 inline-flex items-center gap-2 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar para o início
-            </Link>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold">Medixy</span>
-            </div>
+            </Link> */}
+
+            {/* <div className="flex items-center">
+              <Image src="/Logo.svg" alt="Lunyx" width={207} height={32} />
+            </div> */}
           </div>
 
-          {/* Conteúdo central */}
-          <div className="space-y-8">
+          {/* Conteúdo principal */}
+          <div className="space-y-10">
             <div className="space-y-4">
-              <h1 className="text-4xl leading-tight font-bold text-balance">
-                Gerencie sua clínica com eficiência e simplicidade
+              <h1 className="text-4xl leading-tight font-bold text-balance xl:text-5xl">
+                Assuma o controle das suas finanças e planeje seu futuro
               </h1>
+
               <p className="text-primary-foreground/80 max-w-md text-lg">
-                A plataforma completa para modernizar a gestão da sua clínica
-                médica.
+                Organize receitas, despesas, patrimônio e acompanhe projeções
+                financeiras em uma plataforma simples, moderna e intuitiva.
               </p>
             </div>
 
             {/* Features */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center gap-4">
                 <div className="bg-primary-foreground/20 flex h-10 w-10 items-center justify-center rounded-lg">
-                  <CalendarCheck className="h-5 w-5" />
+                  <PiggyBank className="h-5 w-5" />
                 </div>
+
                 <div>
-                  <p className="font-medium">Agendamento Inteligente</p>
+                  <p className="font-medium">Controle Financeiro</p>
                   <p className="text-primary-foreground/70 text-sm">
-                    Controle completo da sua agenda
+                    Registre receitas e despesas com facilidade
                   </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-4">
                 <div className="bg-primary-foreground/20 flex h-10 w-10 items-center justify-center rounded-lg">
-                  <Shield className="h-5 w-5" />
+                  <ChartSpline className="h-5 w-5" />
                 </div>
+
                 <div>
-                  <p className="font-medium">Segurança Garantida</p>
+                  <p className="font-medium">Análises Inteligentes</p>
                   <p className="text-primary-foreground/70 text-sm">
-                    Dados protegidos e em conformidade
+                    Visualize tendências e padrões de consumo
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="bg-primary-foreground/20 flex h-10 w-10 items-center justify-center rounded-lg">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+
+                <div>
+                  <p className="font-medium">Projeções Financeiras</p>
+                  <p className="text-primary-foreground/70 text-sm">
+                    Planeje metas e acompanhe seu crescimento patrimonial
                   </p>
                 </div>
               </div>
@@ -87,7 +134,7 @@ const AuthenticationPage = async () => {
           {/* Footer */}
           <div className="text-primary-foreground/60 text-sm">
             <p>
-              &copy; {new Date().getFullYear()} Medixy. Todos os direitos
+              &copy; {new Date().getFullYear()} Lunyx. Todos os direitos
               reservados.
             </p>
           </div>
@@ -99,13 +146,13 @@ const AuthenticationPage = async () => {
         <div className="w-full max-w-md space-y-8">
           {/* Header mobile */}
           <div className="space-y-2 text-center lg:hidden">
-            <Link
+            {/* <Link
               href="/"
               className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-2 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
-            </Link>
+            </Link> */}
             <div className="flex items-center justify-center gap-3">
               <Image src="/Logo.svg" alt="Medixy" width={207} height={32} />
             </div>

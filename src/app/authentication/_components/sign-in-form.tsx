@@ -59,7 +59,11 @@ const SignInForm = () => {
   };
 
   async function handleGoogleLogin() {
-    console.log('google');
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: '/dashboard',
+      scopes: ['email', 'profile'],
+    });
   }
 
   const isLoading = form.formState.isSubmitting || isRedirecting;
