@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   ColumnDef,
@@ -12,18 +12,19 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table";
-import { Search } from "lucide-react"; // Columns3Cog
-import * as React from "react";
+} from '@tanstack/react-table';
+import { FileDown, FileText, Search } from 'lucide-react'; // Columns3Cog
+import * as React from 'react';
 
+// import * as XLSX from "xlsx";
 // import { Button } from "@/components/ui/button";
-// import {
-//   DropdownMenu,
-//   DropdownMenuCheckboxItem,
-//   DropdownMenuContent,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -31,38 +32,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { useDebounce } from '@/hooks/use-debounce';
 
-import { DataTablePagination } from "./data-table-paginationr";
+import { Button } from './button';
+import { DataTablePagination } from './data-table-pagination';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-}
+  onRowClick?: (row: TData) => void;
 
-/* -------------------- */
-/* debounce hook */
-/* -------------------- */
-
-function useDebounce<T>(value: T, delay: number) {
-  const [debouncedValue, setDebouncedValue] = React.useState(value);
-
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
+  showExport?: boolean;
+  exportFileName?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onRowClick,
+  showExport,
+  exportFileName,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -73,16 +63,16 @@ export function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
 
   // global search
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [globalFilter, setGlobalFilter] = React.useState('');
 
   const debouncedSearch = useDebounce(globalFilter, 300);
 
   function normalize(value: unknown): string {
-    if (value === null || value === undefined) return "";
+    if (value === null || value === undefined) return '';
 
     return String(value)
-      .normalize("NFD") // separa acentos
-      .replace(/[\u0300-\u036f]/g, "") // remove acentos
+      .normalize('NFD') // separa acentos
+      .replace(/[\u0300-\u036f]/g, '') // remove acentos
       .toLowerCase()
       .trim();
   }
@@ -95,33 +85,33 @@ export function DataTable<TData, TValue>({
     let value = rawValue;
 
     /* ENUM TRADUZIDO (exemplo sex) */
-    if (columnId === "sex") {
+    if (columnId === 'sex') {
       const map: Record<string, string> = {
-        male: "masculino",
-        female: "feminino",
+        male: 'masculino',
+        female: 'feminino',
       };
 
       value = map[String(rawValue)] ?? rawValue;
     }
 
     /* BOOLEAN */
-    if (typeof rawValue === "boolean") {
-      value = rawValue ? "sim verdadeiro ativo" : "nao falso inativo";
+    if (typeof rawValue === 'boolean') {
+      value = rawValue ? 'sim verdadeiro ativo' : 'nao falso inativo';
     }
 
     /* DATA */
     if (rawValue instanceof Date) {
       const date = rawValue;
 
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
       const year = date.getFullYear();
 
       value = `${day}/${month}/${year} ${year}-${month}-${day}`;
     }
 
     /* NUMERO */
-    if (typeof rawValue === "number") {
+    if (typeof rawValue === 'number') {
       value = rawValue.toString();
     }
 
@@ -159,6 +149,51 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  // Exportar para Excel
+  // const handleExportExcel = () => {
+  //   const worksheet = XLSX.utils.json_to_sheet(data);
+
+  //   const workbook = XLSX.utils.book_new();
+
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Dados");
+
+  //   XLSX.writeFile(workbook, `${exportFileName ?? "tabela"}.xlsx`);
+  // };
+
+  // Exportar para PDF
+  const handleExportPDF = async () => {
+    // const jsPDFModule = await import('jspdf');
+    // const autoTableModule = await import('jspdf-autotable');
+    // const jsPDF = jsPDFModule.default;
+    // const autoTable = autoTableModule.default;
+    // const doc = new jsPDF();
+    // const exportableColumns = columns.filter(
+    //   (column) => column.id !== 'actions',
+    // );
+    // const tableHeaders = exportableColumns.map(
+    //   (column) =>
+    //     (column.meta as { exportLabel?: string })?.exportLabel ??
+    //     String(column.id),
+    // );
+    // const tableRows = data.map((item) =>
+    //   exportableColumns.map((column) => {
+    //     const key = column.id as string;
+    //     const meta = column.meta as {
+    //       exportValue?: (row: TData) => unknown;
+    //     };
+    //     if (meta?.exportValue) {
+    //       return String(meta.exportValue(item));
+    //     }
+    //     return String((item as Record<string, unknown>)[key] ?? '');
+    //   }),
+    // );
+    // autoTable(doc, {
+    //   head: [tableHeaders],
+    //   body: tableRows,
+    // });
+    // doc.save(`${exportFileName ?? 'tabela'}.pdf`);
+  };
+
   return (
     <div>
       {/* Toolbar */}
@@ -169,9 +204,10 @@ export function DataTable<TData, TValue>({
             <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
 
             <Input
-              className="w-[250px] pl-8"
+              // className="w-[250px] pl-8"
+              className="pl-8"
               placeholder="Pesquisar..."
-              value={globalFilter ?? ""}
+              value={globalFilter ?? ''}
               onChange={(event) => setGlobalFilter(event.target.value)}
             />
           </div>
@@ -202,6 +238,35 @@ export function DataTable<TData, TValue>({
                 ))}
             </DropdownMenuContent>
           </DropdownMenu> */}
+
+          {/* Type download */}
+          {showExport && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <FileDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                {/* <DropdownMenuCheckboxItem
+                  onClick={handleExportExcel}
+                  className="pl-2"
+                >
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Exportar para Excel
+                </DropdownMenuCheckboxItem> */}
+
+                <DropdownMenuCheckboxItem
+                  onClick={handleExportPDF}
+                  className="pl-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Exportar para PDF
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -231,10 +296,26 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-muted/50 cursor-pointer transition-colors"
+                  onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      onClick={(e) => {
+                        const target = e.target as HTMLElement;
+
+                        if (
+                          target.closest('button') ||
+                          target.closest('[role="checkbox"]') ||
+                          target.closest('a') ||
+                          target.closest('[data-no-row-click="true"]')
+                        ) {
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -249,7 +330,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nenhum resultado encontrado.
+                  Nenhum resultado.
                 </TableCell>
               </TableRow>
             )}

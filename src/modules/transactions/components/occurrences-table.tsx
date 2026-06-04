@@ -14,7 +14,7 @@ import { ListChecks, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { DataTablePagination } from '@/components/ui/data-table-paginationr';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { Input } from '@/components/ui/input';
 import {
   Table,
