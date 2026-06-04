@@ -25,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { walletsTable } from '@/infrastructure/db/schema';
 
 import { upsertWallet } from '../actions/upsert-wallet';
