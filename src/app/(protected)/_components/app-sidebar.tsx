@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
 import {
-    ArrowRightLeft,
-    CreditCard,
-//   Diamond,
+  ArrowRightLeft,
+  CreditCard,
+  //   Diamond,
   LayoutDashboard,
   LogOut,
   TagIcon,
-//   UserRound,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+  //   UserRound,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Sidebar,
   SidebarContent,
@@ -30,32 +30,32 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { SidebarHeaderLogo } from "@/components/ui/sidebar-header-logo";
-import { authClient } from "@/lib/auth-client";
+} from '@/components/ui/sidebar';
+import { SidebarHeaderLogo } from '@/components/ui/sidebar-header-logo';
+import { authClient } from '@/lib/auth-client';
 
 // import { ToggleTheme } from "./toggle-theme";
 
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
+    title: 'Dashboard',
+    url: '/dashboard',
     icon: LayoutDashboard,
   },
   {
-    title: "Transações",
-    url: "/transactions",
+    title: 'Transações',
+    url: '/transactions',
     icon: ArrowRightLeft,
   },
   {
-    title: "Carteiras",
-    url: "/wallets",
+    title: 'Carteiras',
+    url: '/wallets',
     icon: CreditCard,
   },
   {
-    title: "Categorias",
-    url: "/categories",
+    title: 'Categorias',
+    url: '/categories',
     icon: TagIcon,
   },
 ];
@@ -68,9 +68,9 @@ export function AppSidebar() {
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: {
-        credentials: "include", // ADICIONA ISSO
+        credentials: 'include', // ADICIONA ISSO
         onSuccess: () => {
-          router.push("/authentication");
+          router.push('/authentication');
         },
       },
     });
@@ -78,9 +78,9 @@ export function AppSidebar() {
 
   const initialName = () => {
     const name = session.data?.user?.name;
-    if (!name) return "?";
+    if (!name) return '?';
 
-    const names = name.trim().split(" ");
+    const names = name.trim().split(' ');
 
     if (names.length === 1) {
       return names[0][0].toUpperCase();
@@ -103,21 +103,16 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url} >
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <Link href={item.url}>
-                      <item.icon 
-                        className={`
-                          size-4
-                          ${
-                            pathname === item.url
-                              ? "text-transparent"
-                              : ""
-                          }
-                        `}
+                      <item.icon
+                        className={`size-4 ${
+                          pathname === item.url ? 'text-transparent' : ''
+                        } `}
                         style={
                           pathname === item.url
                             ? {
-                                stroke: "var(--lunyx-indigo)",
+                                stroke: 'var(--lunyx-indigo)',
                               }
                             : undefined
                         }
@@ -158,7 +153,7 @@ export function AppSidebar() {
                   <Avatar>
                     <AvatarFallback
                       className="bg-primary text-primary"
-                      style={{ background: "var(--lunyx-gradient)" }}
+                      style={{ background: 'var(--lunyx-gradient)' }}
                     >
                       {initialName()}
                     </AvatarFallback>

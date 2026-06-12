@@ -41,7 +41,8 @@ const TransactionSummaryCards = ({ summary }: TransactionSummaryCardsProps) => {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => (
         <Card key={card.title} className="border-border/60 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          {/* <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> */}
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-muted-foreground text-sm font-medium">
               {card.title}
             </CardTitle>
@@ -54,8 +55,14 @@ const TransactionSummaryCards = ({ summary }: TransactionSummaryCardsProps) => {
               <card.icon className={cn('h-4 w-4', card.className)} />
             </div>
           </CardHeader>
-          <CardContent>
-            <p className={cn('text-2xl font-semibold tracking-tight', card.className)}>
+          {/* <CardContent> */}
+          <CardContent className="">
+            <p
+              className={cn(
+                'text-2xl font-semibold tracking-tight',
+                card.className,
+              )}
+            >
               {card.value}
             </p>
           </CardContent>

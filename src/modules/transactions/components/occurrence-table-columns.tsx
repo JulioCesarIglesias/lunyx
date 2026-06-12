@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { categoriesTable, walletsTable } from '@/infrastructure/db/schema';
 
 import { FrequencyTypeEnum } from '../constants/frequency-types';
-import { paymentMethodLabels } from '../constants/payment-methods';
+// import { paymentMethodLabels } from '../constants/payment-methods';
 import {
   TransactionStatusEnum,
   transactionStatusLabels,
@@ -34,15 +34,19 @@ type CategoryOption = Pick<typeof categoriesTable.$inferSelect, 'id' | 'name'>;
 function SortableHeader({
   label,
   onClick,
+  align = 'left',
 }: {
   label: string;
   onClick: () => void;
+  align?: 'left' | 'right';
 }) {
   return (
     <Button
       variant="ghost"
       onClick={onClick}
-      className="cursor-pointer -ml-3 h-8 px-2"
+      className={`h-8 cursor-pointer px-2 ${
+        align === 'right' ? '-mr-3 ml-auto' : '-ml-3'
+      }`}
     >
       {label}
       <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -88,25 +92,29 @@ export function createOccurrenceTableColumns(
     {
       id: 'select',
       header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value: boolean) =>
-            table.toggleAllPageRowsSelected(!!value)
-          }
-          aria-label="Selecionar todos"
-          onClick={(e: MouseEvent) => e.stopPropagation()}
-        />
+        <div className="flex justify-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value: boolean) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Selecionar todos"
+            onClick={(e: MouseEvent) => e.stopPropagation()}
+          />
+        </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
-          aria-label="Selecionar linha"
-          onClick={(e: MouseEvent) => e.stopPropagation()}
-        />
+        <div className="flex justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
+            aria-label="Selecionar linha"
+            onClick={(e: MouseEvent) => e.stopPropagation()}
+          />
+        </div>
       ),
       enableSorting: false,
       enableHiding: false,
@@ -136,9 +144,11 @@ export function createOccurrenceTableColumns(
           <button
             type="button"
             onClick={() => onRowOpen(row.original)}
-            className="hover:text-primary min-w-[140px] cursor-pointer text-left transition-colors"
+            className="hover:text-primary block min-w-0 cursor-pointer text-left transition-colors"
           >
-            <p className="font-medium">{transaction.title}</p>
+            <p className="max-w-[240px] truncate font-medium xl:max-w-[320px]">
+              {transaction.title}
+            </p>
             {sequenceLabel && (
               <p className="text-muted-foreground text-xs">{sequenceLabel}</p>
             )}
@@ -155,22 +165,13 @@ export function createOccurrenceTableColumns(
       ),
     },
     {
-      id: 'transactionType',
-      accessorFn: (row) => row.transaction.transactionType,
-      header: 'Tipo',
-      cell: ({ row }) => (
-        <TransactionTypeBadge
-          type={row.original.transaction.transactionType as TransactionTypeEnum}
-        />
-      ),
-    },
-    {
       id: 'amountInCents',
       accessorKey: 'amountInCents',
       header: ({ column }) => (
         <div className="text-right">
           <SortableHeader
             label="Valor"
+            align="right"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           />
         </div>
@@ -191,11 +192,21 @@ export function createOccurrenceTableColumns(
       },
     },
     {
+      id: 'transactionType',
+      accessorFn: (row) => row.transaction.transactionType,
+      header: 'Tipo',
+      cell: ({ row }) => (
+        <TransactionTypeBadge
+          type={row.original.transaction.transactionType as TransactionTypeEnum}
+        />
+      ),
+    },
+    {
       id: 'wallet',
       accessorFn: (row) => row.transaction.wallet.name,
       header: 'Carteira',
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex max-w-[180px] items-center gap-2">
           {row.original.transaction.wallet.color && (
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -204,7 +215,9 @@ export function createOccurrenceTableColumns(
               }}
             />
           )}
-          <span>{row.original.transaction.wallet.name}</span>
+          <span className="truncate">
+            {row.original.transaction.wallet.name}
+          </span>
         </div>
       ),
     },
@@ -213,21 +226,21 @@ export function createOccurrenceTableColumns(
       accessorFn: (row) => row.transaction.category?.name ?? '—',
       header: 'Categoria',
       cell: ({ row }) => (
-        <span className="text-muted-foreground">
+        <span className="text-muted-foreground block max-w-[160px] truncate">
           {row.original.transaction.category?.name ?? '—'}
         </span>
       ),
     },
-    {
-      id: 'paymentMethod',
-      accessorFn: (row) => row.transaction.paymentMethod,
-      header: 'Pagamento',
-      cell: ({ row }) =>
-        paymentMethodLabels[
-          row.original.transaction
-            .paymentMethod as keyof typeof paymentMethodLabels
-        ],
-    },
+    // {
+    //   id: 'paymentMethod',
+    //   accessorFn: (row) => row.transaction.paymentMethod,
+    //   header: 'Pagamento',
+    //   cell: ({ row }) =>
+    //     paymentMethodLabels[
+    //       row.original.transaction
+    //         .paymentMethod as keyof typeof paymentMethodLabels
+    //     ],
+    // },
     {
       id: 'dueDate',
       accessorKey: 'dueDate',

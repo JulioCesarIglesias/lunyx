@@ -79,10 +79,10 @@ const OccurrenceTableActions = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={onEditStatus}>
+          {/* <DropdownMenuItem onClick={onEditStatus}>
             <EditIcon className="h-4 w-4" />
             Alterar status
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem onClick={() => setEditTransactionOpen(true)}>
             <EditIcon className="h-4 w-4" />
             Editar transação

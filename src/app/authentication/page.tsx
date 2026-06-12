@@ -1,4 +1,4 @@
-import { ArrowLeft, ChartSpline, PiggyBank, TrendingUp } from 'lucide-react';
+import { ChartSpline, PiggyBank, TrendingUp } from 'lucide-react';
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
