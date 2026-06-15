@@ -9,6 +9,7 @@ import {
   OccurrenceWithRelations,
   TransactionSummary,
 } from '../types/occurrence-with-relations';
+import MonthNavigation from './month-navigation';
 import OccurrencesTable from './occurrences-table';
 import TransactionFiltersBar from './transaction-filters';
 import TransactionSummaryCards from './transaction-summary-cards';
@@ -44,6 +45,8 @@ const TransactionsContent = ({
       />
 
       <TransactionSummaryCards summary={summary} />
+
+      <MonthNavigation month={filters.month} year={filters.year} />
 
       {occurrences.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">

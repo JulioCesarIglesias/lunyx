@@ -196,6 +196,13 @@ const OccurrencesTable = ({
   const table = useReactTable({
     data: occurrences,
     columns,
+
+    initialState: {
+      pagination: {
+        pageSize: 40,
+      },
+    },
+
     getRowId: (row) => row.id,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,

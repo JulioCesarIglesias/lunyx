@@ -30,13 +30,27 @@ const AddTransactionButton = ({
 
   return (
     <>
+      {/* Desktop */}
       <Button
         disabled={disabled}
         onClick={() => setIsOpen(true)}
-        className="cursor-pointer"
+        className="hidden cursor-pointer md:flex"
       >
         <PlusIcon />
         Nova transação
+      </Button>
+
+      {/* Mobile */}
+      <Button
+        size="icon"
+        disabled={disabled}
+        onClick={() => setIsOpen(true)}
+        className="fixed right-4 bottom-20 z-50 h-10 w-10 cursor-pointer rounded-full shadow-xl md:hidden"
+        style={{
+          background: 'var(--lunyx-gradient)',
+        }}
+      >
+        <PlusIcon className="h-5 w-5" color="#fff" />
       </Button>
 
       <UpsertTransactionForm

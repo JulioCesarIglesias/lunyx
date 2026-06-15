@@ -38,37 +38,78 @@ const TransactionSummaryCards = ({ summary }: TransactionSummaryCardsProps) => {
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {cards.map((card) => (
-        <Card key={card.title} className="border-border/60 shadow-sm">
-          {/* <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> */}
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-muted-foreground text-sm font-medium">
-              {card.title}
-            </CardTitle>
-            <div
-              className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-lg',
-                card.bgClassName,
-              )}
-            >
-              <card.icon className={cn('h-4 w-4', card.className)} />
+    <>
+      {/* MOBILE */}
+      <div className="lg:hidden">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="space-y-3 p-4">
+            <div>
+              <p className="text-muted-foreground text-sm">Saldo do período</p>
+
+              <p
+                className={cn(
+                  'text-2xl font-bold tracking-tight',
+                  summary.balanceInCents >= 0
+                    ? 'text-emerald-600'
+                    : 'text-rose-600',
+                )}
+              >
+                {formatCurrencyFromCents(summary.balanceInCents)}
+              </p>
             </div>
-          </CardHeader>
-          {/* <CardContent> */}
-          <CardContent className="">
-            <p
-              className={cn(
-                'text-2xl font-semibold tracking-tight',
-                card.className,
-              )}
-            >
-              {card.value}
-            </p>
+
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1 text-emerald-600">
+                <ArrowUpRight className="h-4 w-4" />
+                <span>
+                  {formatCurrencyFromCents(summary.totalIncomeInCents)}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 text-rose-600">
+                <ArrowDownLeft className="h-4 w-4" />
+                <span>
+                  {formatCurrencyFromCents(summary.totalExpenseInCents)}
+                </span>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      ))}
-    </div>
+      </div>
+
+      {/* DESKTOP */}
+      <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <Card key={card.title} className="border-border/60 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
+                {card.title}
+              </CardTitle>
+
+              <div
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg',
+                  card.bgClassName,
+                )}
+              >
+                <card.icon className={cn('h-4 w-4', card.className)} />
+              </div>
+            </CardHeader>
+
+            <CardContent>
+              <p
+                className={cn(
+                  'text-2xl font-semibold tracking-tight',
+                  card.className,
+                )}
+              >
+                {card.value}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </>
   );
 };
 
