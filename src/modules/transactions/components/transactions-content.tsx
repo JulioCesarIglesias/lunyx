@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from 'dayjs';
 import { ArrowRightLeft } from 'lucide-react';
 
 import { categoriesTable, walletsTable } from '@/infrastructure/db/schema';
@@ -46,7 +47,10 @@ const TransactionsContent = ({
 
       <TransactionSummaryCards summary={summary} />
 
-      <MonthNavigation month={filters.month} year={filters.year} />
+      <MonthNavigation
+        month={filters.month ?? dayjs().month() + 1}
+        year={filters.year ?? dayjs().year()}
+      />
 
       {occurrences.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
