@@ -29,7 +29,6 @@ import { categoriesTable, walletsTable } from '@/infrastructure/db/schema';
 import { deleteTransaction } from '../actions/delete-transaction';
 import { OccurrenceWithRelations } from '../types/occurrence-with-relations';
 import UpsertOccurrenceForm from './upsert-occurrence-form';
-import UpsertTransactionForm from './upsert-transaction-form';
 
 type WalletOption = Pick<
   typeof walletsTable.$inferSelect,
@@ -51,7 +50,7 @@ const OccurrenceTableActions = ({
   categories,
   onEditStatus,
 }: OccurrenceTableActionsProps) => {
-  const [editTransactionOpen, setEditTransactionOpen] = useState(false);
+  const [editOccurrenceOpen, setEditOccurrenceOpen] = useState(false);
   const [deleteAlertIsOpen, setDeleteAlertIsOpen] = useState(false);
 
   const deleteTransactionAction = useAction(deleteTransaction, {
@@ -83,9 +82,9 @@ const OccurrenceTableActions = ({
             <EditIcon className="h-4 w-4" />
             Alterar status
           </DropdownMenuItem> */}
-          <DropdownMenuItem onClick={() => setEditTransactionOpen(true)}>
+          <DropdownMenuItem onClick={() => setEditOccurrenceOpen(true)}>
             <EditIcon className="h-4 w-4" />
-            Editar transação
+            Editar lançamento
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setDeleteAlertIsOpen(true)}>
             <TrashIcon className="h-4 w-4" />
@@ -95,9 +94,11 @@ const OccurrenceTableActions = ({
       </DropdownMenu>
 
       <UpsertOccurrenceForm
-        isOpen={editTransactionOpen}
+        isOpen={editOccurrenceOpen}
         occurrence={occurrence}
-        onSuccess={() => setEditTransactionOpen(false)}
+        wallets={wallets}
+        categories={categories}
+        onSuccess={() => setEditOccurrenceOpen(false)}
       />
 
       <AlertDialog open={deleteAlertIsOpen} onOpenChange={setDeleteAlertIsOpen}>

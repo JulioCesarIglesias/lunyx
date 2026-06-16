@@ -29,7 +29,7 @@ export const BottomNavigation = () => {
               href={item.href}
               className={cn(
                 'flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] leading-none',
-                active ? 'text-primary' : 'text-muted-foreground',
+                active ? 'text-indigo-500' : 'text-muted-foreground',
               )}
             >
               <Icon className="h-5 w-5 shrink-0" />

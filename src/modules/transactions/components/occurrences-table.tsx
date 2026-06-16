@@ -464,6 +464,8 @@ const OccurrencesTable = ({
       <UpsertOccurrenceForm
         isOpen={occurrenceFormOpen}
         occurrence={selectedOccurrence}
+        wallets={wallets}
+        categories={categories}
         onSuccess={handleOccurrenceFormClose}
       />
 

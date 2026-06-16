@@ -45,7 +45,7 @@ const AddTransactionButton = ({
         size="icon"
         disabled={disabled}
         onClick={() => setIsOpen(true)}
-        className="fixed right-4 bottom-20 z-50 h-10 w-10 cursor-pointer rounded-full shadow-xl md:hidden"
+        className="fixed right-4 bottom-20 z-50 h-14 w-14 cursor-pointer rounded-full shadow-xl md:hidden"
         style={{
           background: 'var(--lunyx-gradient)',
         }}
