@@ -66,6 +66,8 @@ export const updateOccurrenceStatus = actionClient
       .where(eq(transactionOccurrencesTable.id, parsedInput.id));
 
     revalidatePath('/transactions');
+    revalidatePath('/dashboard');
+    revalidatePath('/categories');
   });
 
 export const bulkUpdateOccurrenceStatus = actionClient
@@ -107,4 +109,6 @@ export const bulkUpdateOccurrenceStatus = actionClient
       .where(inArray(transactionOccurrencesTable.id, parsedInput.ids));
 
     revalidatePath('/transactions');
+    revalidatePath('/dashboard');
+    revalidatePath('/categories');
   });

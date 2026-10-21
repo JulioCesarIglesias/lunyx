@@ -20,9 +20,9 @@ import { auth } from '@/lib/auth';
 import {
   getCategoriesForSelect,
   getOccurrences,
-  getOccurrenceSummary,
   getWalletsForSelect,
   parseTransactionFilters,
+  summarizeOccurrences,
 } from '../actions/get-transactions/get-transactions';
 import AddTransactionButton from './add-transaction-button';
 import TransactionsContent from './transactions-content';
@@ -47,12 +47,12 @@ const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
   const resolvedSearchParams = await searchParams;
   const filters = parseTransactionFilters(resolvedSearchParams);
 
-  const [occurrences, summary, wallets, categories] = await Promise.all([
+  const [occurrences, wallets, categories] = await Promise.all([
     getOccurrences(session.user.id, filters),
-    getOccurrenceSummary(session.user.id, filters),
     getWalletsForSelect(session.user.id),
     getCategoriesForSelect(session.user.id),
   ]);
+  const summary = summarizeOccurrences(occurrences);
 
   const canCreateTransaction = wallets.length > 0;
 

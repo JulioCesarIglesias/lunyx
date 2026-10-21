@@ -1,13 +1,15 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { db } from '@/infrastructure/db';
 import {
+  categoriesTable,
   transactionOccurrencesTable,
   transactionsTable,
+  walletsTable,
 } from '@/infrastructure/db/schema';
 import { auth } from '@/lib/auth';
 import { actionClient } from '@/lib/next-safe-action';
@@ -57,12 +59,44 @@ export const upsertTransaction = actionClient
       isActive: parsedInput.isActive ?? true,
     };
 
+    const [wallet] = await db
+      .select({ id: walletsTable.id })
+      .from(walletsTable)
+      .where(
+        and(
+          eq(walletsTable.id, parsedInput.walletId),
+          eq(walletsTable.userId, session.user.id),
+          eq(walletsTable.isActive, true),
+        ),
+      )
+      .limit(1);
+
+    if (!wallet) throw new Error('Carteira não encontrada ou inativa');
+
+    if (parsedInput.categoryId) {
+      const [category] = await db
+        .select({ id: categoriesTable.id })
+        .from(categoriesTable)
+        .where(
+          and(
+            eq(categoriesTable.id, parsedInput.categoryId),
+            eq(categoriesTable.userId, session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (!category) throw new Error('Categoria não encontrada');
+    }
+
     if (parsedInput.id) {
       const existing = await db.query.transactionsTable.findFirst({
-        where: eq(transactionsTable.id, parsedInput.id),
+        where: and(
+          eq(transactionsTable.id, parsedInput.id),
+          eq(transactionsTable.userId, session.user.id),
+        ),
       });
 
-      if (!existing || existing.userId !== session.user.id) {
+      if (!existing) {
         throw new Error('Transação não encontrada');
       }
 
@@ -71,23 +105,27 @@ export const upsertTransaction = actionClient
         .set(payload)
         .where(eq(transactionsTable.id, parsedInput.id));
     } else {
-      const [created] = await db
-        .insert(transactionsTable)
-        .values(payload)
-        .returning({ id: transactionsTable.id });
+      await db.transaction(async (tx) => {
+        const [created] = await tx
+          .insert(transactionsTable)
+          .values(payload)
+          .returning({ id: transactionsTable.id });
 
-      const occurrenceRows = buildOccurrenceRows({
-        transactionId: created.id,
-        amountTotalInCents,
-        installments,
-        frequencyType: parsedInput.frequencyType,
-        startDate,
+        const occurrenceRows = buildOccurrenceRows({
+          transactionId: created.id,
+          amountTotalInCents,
+          installments,
+          frequencyType: parsedInput.frequencyType,
+          startDate,
+        });
+
+        if (occurrenceRows.length > 0) {
+          await tx.insert(transactionOccurrencesTable).values(occurrenceRows);
+        }
       });
-
-      if (occurrenceRows.length > 0) {
-        await db.insert(transactionOccurrencesTable).values(occurrenceRows);
-      }
     }
 
     revalidatePath('/transactions');
+    revalidatePath('/dashboard');
+    revalidatePath('/categories');
   });

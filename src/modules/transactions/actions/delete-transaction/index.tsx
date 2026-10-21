@@ -38,4 +38,6 @@ export const deleteTransaction = actionClient
       .where(eq(transactionsTable.id, parsedInput.id));
 
     revalidatePath('/transactions');
+    revalidatePath('/dashboard');
+    revalidatePath('/categories');
   });

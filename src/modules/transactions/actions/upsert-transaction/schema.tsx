@@ -25,7 +25,8 @@ export const upsertTransactionSchema = z
     frequencyType: z.nativeEnum(FrequencyTypeEnum),
     amountInReais: z
       .number({ error: 'Valor é obrigatório' })
-      .positive('Valor deve ser maior que zero'),
+      .positive('Valor deve ser maior que zero')
+      .max(21_474_836.47, 'Valor máximo excedido'),
     installments: z.coerce.number().int().min(1).max(120),
     startDate: z.coerce.date({ message: 'Data é obrigatória' }),
     isActive: z.boolean().optional(),

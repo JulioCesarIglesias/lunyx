@@ -1,5 +1,6 @@
 'use server';
 
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
@@ -21,13 +22,26 @@ export const upsertCategory = actionClient
       throw new Error('Unauthorized');
     }
 
-    await db
-      .insert(categoriesTable)
-      .values({ ...parsedInput, id: parsedInput.id, userId: session.user.id })
-      .onConflictDoUpdate({
-        target: [categoriesTable.id],
-        set: { ...parsedInput },
+    if (parsedInput.id) {
+      const [updated] = await db
+        .update(categoriesTable)
+        .set({ name: parsedInput.name })
+        .where(
+          and(
+            eq(categoriesTable.id, parsedInput.id),
+            eq(categoriesTable.userId, session.user.id),
+          ),
+        )
+        .returning({ id: categoriesTable.id });
+
+      if (!updated) throw new Error('Categoria não encontrada');
+    } else {
+      await db.insert(categoriesTable).values({
+        name: parsedInput.name,
+        userId: session.user.id,
       });
+    }
 
     revalidatePath('/categories');
+    revalidatePath('/transactions');
   });

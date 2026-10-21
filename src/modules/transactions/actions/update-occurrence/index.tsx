@@ -6,8 +6,10 @@ import { headers } from 'next/headers';
 
 import { db } from '@/infrastructure/db';
 import {
+  categoriesTable,
   transactionOccurrencesTable,
   transactionsTable,
+  walletsTable,
 } from '@/infrastructure/db/schema';
 import { auth } from '@/lib/auth';
 import { actionClient } from '@/lib/next-safe-action';
@@ -54,6 +56,35 @@ export const updateOccurrence = actionClient
       throw new Error('Lançamento não encontrado');
     }
 
+    const [wallet] = await db
+      .select({ id: walletsTable.id })
+      .from(walletsTable)
+      .where(
+        and(
+          eq(walletsTable.id, parsedInput.walletId),
+          eq(walletsTable.userId, session.user.id),
+          eq(walletsTable.isActive, true),
+        ),
+      )
+      .limit(1);
+
+    if (!wallet) throw new Error('Carteira não encontrada ou inativa');
+
+    if (parsedInput.categoryId) {
+      const [category] = await db
+        .select({ id: categoriesTable.id })
+        .from(categoriesTable)
+        .where(
+          and(
+            eq(categoriesTable.id, parsedInput.categoryId),
+            eq(categoriesTable.userId, session.user.id),
+          ),
+        )
+        .limit(1);
+
+      if (!category) throw new Error('Categoria não encontrada');
+    }
+
     const { transactionId } = rows[0];
 
     // Execute both updates in a single database transaction
@@ -80,4 +111,6 @@ export const updateOccurrence = actionClient
     });
 
     revalidatePath('/transactions');
+    revalidatePath('/dashboard');
+    revalidatePath('/categories');
   });

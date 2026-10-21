@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -189,7 +189,7 @@ const UpsertWalletForm = ({
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" className="cursor-pointer">
+              <Button type="button" variant="outline" className="cursor-pointer">
                 Cancelar
               </Button>
             </DialogClose>
@@ -199,7 +199,9 @@ const UpsertWalletForm = ({
               disabled={upsertWalletAction.isExecuting}
               className="cursor-pointer"
             >
-              {upsertWalletAction.isExecuting ? 'Salvando...' : 'Salvar'}
+              {upsertWalletAction.isExecuting ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+              ) : 'Salvar'}
             </Button>
           </DialogFooter>
         </form>

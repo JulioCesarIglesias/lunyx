@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Tag } from 'lucide-react';
+import { Loader2, Tag } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -106,9 +106,13 @@ const UpsertCategoryForm = ({
           </FieldGroup>
           <DialogFooter className="mt-5">
             <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
+              <Button type="button" variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button type="submit">Salvar</Button>
+              <Button type="submit" disabled={upsertCategoryAction.isExecuting}>
+                {upsertCategoryAction.isExecuting ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+                ) : 'Salvar'}
+              </Button>
           </DialogFooter>
         </form>
       </DialogContent>

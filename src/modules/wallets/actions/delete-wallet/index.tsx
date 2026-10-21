@@ -1,12 +1,12 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { db } from '@/infrastructure/db';
-import { walletsTable } from '@/infrastructure/db/schema';
+import { transactionsTable, walletsTable } from '@/infrastructure/db/schema';
 import { auth } from '@/lib/auth';
 import { actionClient } from '@/lib/next-safe-action';
 
@@ -23,15 +23,41 @@ export const deleteWallet = actionClient
     if (!session?.user) {
       throw new Error('Unauthorized');
     }
-    const wallet = await db.query.walletsTable.findFirst({
-      where: eq(walletsTable.id, parsedInput.id),
+    await db.transaction(async (tx) => {
+      const [wallet] = await tx
+        .select({ id: walletsTable.id })
+        .from(walletsTable)
+        .where(
+          and(
+            eq(walletsTable.id, parsedInput.id),
+            eq(walletsTable.userId, session.user.id),
+          ),
+        )
+        .for('update')
+        .limit(1);
+
+      if (!wallet) throw new Error('Carteira não encontrada');
+
+      const [transaction] = await tx
+        .select({ id: transactionsTable.id })
+        .from(transactionsTable)
+        .where(eq(transactionsTable.walletId, wallet.id))
+        .limit(1);
+
+      if (transaction) {
+        throw new Error(
+          'Esta carteira possui transações. Desative-a para manter seu histórico financeiro.',
+        );
+      }
+
+      await tx
+        .delete(walletsTable)
+        .where(
+          and(
+            eq(walletsTable.id, wallet.id),
+            eq(walletsTable.userId, session.user.id),
+          ),
+        );
     });
-    if (!wallet) {
-      throw new Error('Carteira não encontrada');
-    }
-    if (wallet.userId !== session.user.id) {
-      throw new Error('Carteira não encontrada');
-    }
-    await db.delete(walletsTable).where(eq(walletsTable.id, parsedInput.id));
     revalidatePath('/wallets');
   });

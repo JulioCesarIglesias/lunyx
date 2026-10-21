@@ -11,7 +11,7 @@ export const updateOccurrenceSchema = z.object({
 
   // transaction fields
   description: z.string().trim().max(500).nullable().optional(),
-  amountInCents: z.number().int().positive(),
+  amountInCents: z.number().int().positive().max(2_147_483_647),
   dueDate: z.date(),
   walletId: z.string().uuid(),
   categoryId: z.string().uuid().nullable().optional(),

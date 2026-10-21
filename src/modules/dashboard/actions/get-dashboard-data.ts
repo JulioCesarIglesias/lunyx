@@ -1,13 +1,15 @@
 import dayjs from 'dayjs';
-import { and, eq, gte, lte } from 'drizzle-orm';
+import { and, eq, gte, lte, ne } from 'drizzle-orm';
 
 import { db } from '@/infrastructure/db';
 import {
+  categoriesTable,
   transactionOccurrencesTable,
   transactionsTable,
   walletsTable,
 } from '@/infrastructure/db/schema';
 import { FrequencyTypeEnum } from '@/modules/transactions/constants/frequency-types';
+import { TransactionStatusEnum } from '@/modules/transactions/constants/transaction-status';
 import { TransactionTypeEnum } from '@/modules/transactions/constants/transaction-types';
 
 export interface DashboardFilters {
@@ -90,6 +92,7 @@ export async function getDashboardData(
       transactionType: transactionsTable.transactionType,
       frequencyType: transactionsTable.frequencyType,
       categoryId: transactionsTable.categoryId,
+      categoryName: categoriesTable.name,
       walletId: transactionsTable.walletId,
       // wallet name (joined inline)
       walletName: walletsTable.name,
@@ -99,28 +102,30 @@ export async function getDashboardData(
       transactionsTable,
       eq(transactionOccurrencesTable.transactionId, transactionsTable.id),
     )
-    .innerJoin(walletsTable, eq(transactionsTable.walletId, walletsTable.id))
+    .innerJoin(
+      walletsTable,
+      and(
+        eq(transactionsTable.walletId, walletsTable.id),
+        eq(transactionsTable.userId, walletsTable.userId),
+      ),
+    )
+    .leftJoin(
+      categoriesTable,
+      and(
+        eq(transactionsTable.categoryId, categoriesTable.id),
+        eq(transactionsTable.userId, categoriesTable.userId),
+      ),
+    )
     .where(
       and(
         eq(transactionsTable.userId, userId),
+        eq(transactionsTable.isActive, true),
         eq(transactionOccurrencesTable.isDeleted, false),
+        ne(transactionOccurrencesTable.status, TransactionStatusEnum.CANCELED),
         gte(transactionOccurrencesTable.dueDate, startOfMonth),
         lte(transactionOccurrencesTable.dueDate, endOfMonth),
       ),
     );
-
-  // Fetch categories separately (small table, fast)
-  const categoryMap = new Map<string, string>();
-  const uniqueCatIds = [
-    ...new Set(rows.map((r) => r.categoryId).filter(Boolean)),
-  ] as string[];
-  if (uniqueCatIds.length > 0) {
-    const cats = await db.query.categoriesTable.findMany({
-      where: (t, { inArray }) => inArray(t.id, uniqueCatIds),
-      columns: { id: true, name: true },
-    });
-    cats.forEach((c) => categoryMap.set(c.id, c.name));
-  }
 
   // ── Compute everything in JS (no extra queries) ──────────────────
   let totalIncomeInCents = 0;
@@ -149,9 +154,7 @@ export async function getDashboardData(
     // Category breakdown (expenses only)
     if (isExpense) {
       const catKey = row.categoryId ?? '__none__';
-      const catName = row.categoryId
-        ? (categoryMap.get(row.categoryId) ?? 'Sem categoria')
-        : 'Sem categoria';
+      const catName = row.categoryName ?? 'Sem categoria';
 
       const existing = catMap.get(catKey);
       if (existing) {

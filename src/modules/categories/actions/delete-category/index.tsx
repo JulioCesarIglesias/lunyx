@@ -36,4 +36,6 @@ export const deleteCategory = actionClient
       .delete(categoriesTable)
       .where(eq(categoriesTable.id, parsedInput.id));
     revalidatePath('/categories');
+    revalidatePath('/transactions');
+    revalidatePath('/dashboard');
   });

@@ -42,8 +42,8 @@ const WalletCard = ({ wallet }: WalletCardProps) => {
     onSuccess: () => {
       toast.success('Carteira excluída com sucesso');
     },
-    onError: () => {
-      toast.error('Erro ao excluir carteira');
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? 'Erro ao excluir carteira');
     },
   });
 
@@ -113,7 +113,8 @@ const WalletCard = ({ wallet }: WalletCardProps) => {
                       <AlertDialogTitle>Excluir carteira?</AlertDialogTitle>
 
                       <AlertDialogDescription>
-                        Esta ação não poderá ser desfeita.
+                        Carteiras com transações não podem ser excluídas. Nesse
+                        caso, desative-a para preservar o histórico financeiro.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
 

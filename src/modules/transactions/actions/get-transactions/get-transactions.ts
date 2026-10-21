@@ -3,14 +3,16 @@ import { and, asc, desc, eq, gte, lte } from 'drizzle-orm';
 
 import { db } from '@/infrastructure/db';
 import {
+  categoriesTable,
   transactionOccurrencesTable,
   transactionsTable,
+  walletsTable,
 } from '@/infrastructure/db/schema';
 
+import { TransactionStatusEnum } from '../../constants/transaction-status';
 import { TransactionTypeEnum } from '../../constants/transaction-types';
 import {
   OccurrenceWithRelations,
-  TransactionForOccurrence,
   TransactionSummary,
 } from '../../types/occurrence-with-relations';
 import {
@@ -88,71 +90,81 @@ function buildTransactionFilters(
   return and(...conditions);
 }
 
-function toTransactionForOccurrence(
-  transaction: typeof transactionsTable.$inferSelect & {
-    wallet: TransactionForOccurrence['wallet'];
-    category: TransactionForOccurrence['category'];
-    occurrences: (typeof transactionOccurrencesTable.$inferSelect)[];
-  },
-): TransactionForOccurrence {
-  const { occurrences: _occurrences, ...rest } = transaction;
-  return rest;
-}
-
 export async function getOccurrences(
   userId: string,
   filters: TransactionFilters,
 ): Promise<OccurrenceWithRelations[]> {
   const { startOfMonth, endOfMonth } = getMonthRange(filters);
 
-  const transactions = await db.query.transactionsTable.findMany({
-    where: buildTransactionFilters(userId, filters),
-    with: {
-      wallet: true,
-      category: true,
-      occurrences: {
-        where: and(
-          eq(transactionOccurrencesTable.isDeleted, false),
-          gte(transactionOccurrencesTable.dueDate, startOfMonth),
-          lte(transactionOccurrencesTable.dueDate, endOfMonth),
-        ),
-        orderBy: [desc(transactionOccurrencesTable.dueDate)],
-      },
+  const conditions = [
+    buildTransactionFilters(userId, filters),
+    eq(transactionsTable.isActive, true),
+    eq(transactionOccurrencesTable.isDeleted, false),
+    gte(transactionOccurrencesTable.dueDate, startOfMonth),
+    lte(transactionOccurrencesTable.dueDate, endOfMonth),
+  ];
+
+  const rows = await db
+    .select({
+      occurrence: transactionOccurrencesTable,
+      transaction: transactionsTable,
+      wallet: walletsTable,
+      category: categoriesTable,
+    })
+    .from(transactionOccurrencesTable)
+    .innerJoin(
+      transactionsTable,
+      eq(transactionOccurrencesTable.transactionId, transactionsTable.id),
+    )
+    .innerJoin(
+      walletsTable,
+      and(
+        eq(transactionsTable.walletId, walletsTable.id),
+        eq(transactionsTable.userId, walletsTable.userId),
+      ),
+    )
+    .leftJoin(
+      categoriesTable,
+      and(
+        eq(transactionsTable.categoryId, categoriesTable.id),
+        eq(transactionsTable.userId, categoriesTable.userId),
+      ),
+    )
+    .where(and(...conditions))
+    .orderBy(
+      desc(transactionOccurrencesTable.dueDate),
+      asc(transactionsTable.title),
+    );
+
+  return rows.map(({ occurrence, transaction, wallet, category }) => ({
+    ...occurrence,
+    transaction: {
+      ...transaction,
+      wallet,
+      category,
     },
-    orderBy: [desc(transactionsTable.startDate), asc(transactionsTable.title)],
-  });
-
-  const flat: OccurrenceWithRelations[] = [];
-
-  for (const transaction of transactions) {
-    const transactionData = toTransactionForOccurrence(transaction);
-
-    for (const occurrence of transaction.occurrences) {
-      flat.push({
-        ...occurrence,
-        transaction: transactionData,
-      });
-    }
-  }
-
-  return flat.sort(
-    (a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime(),
-  );
+  }));
 }
 
-export async function getOccurrenceSummary(
-  userId: string,
-  filters: TransactionFilters,
-): Promise<TransactionSummary> {
-  const occurrences = await getOccurrences(userId, filters);
-
-  const totalIncomeInCents = occurrences
-    .filter((o) => o.transaction.transactionType === TransactionTypeEnum.INCOME)
-    .reduce((sum, o) => sum + o.amountInCents, 0);
-
-  const totalExpenseInCents = occurrences
-    .filter((o) => o.transaction.transactionType === TransactionTypeEnum.EXPENSE)
-    .reduce((sum, o) => sum + o.amountInCents, 0);
+export function summarizeOccurrences(
+  occurrences: OccurrenceWithRelations[],
+): TransactionSummary {
+  const totalIncomeInCents = occurrences.reduce(
+    (sum, occurrence) =>
+      occurrence.status !== TransactionStatusEnum.CANCELED &&
+      occurrence.transaction.transactionType === TransactionTypeEnum.INCOME
+        ? sum + occurrence.amountInCents
+        : sum,
+    0,
+  );
+  const totalExpenseInCents = occurrences.reduce(
+    (sum, occurrence) =>
+      occurrence.status !== TransactionStatusEnum.CANCELED &&
+      occurrence.transaction.transactionType === TransactionTypeEnum.EXPENSE
+        ? sum + occurrence.amountInCents
+        : sum,
+    0,
+  );
 
   return {
     totalIncomeInCents,

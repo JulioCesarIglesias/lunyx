@@ -83,8 +83,8 @@ const AuthenticationPage = async () => {
               </h1>
 
               <p className="text-primary-foreground/80 max-w-md text-lg">
-                Organize receitas, despesas, patrimônio e acompanhe projeções
-                financeiras em uma plataforma simples, moderna e intuitiva.
+                Organize receitas e despesas, acompanhe vencimentos e entenda
+                seus hábitos financeiros em uma plataforma simples e intuitiva.
               </p>
             </div>
 
@@ -111,7 +111,7 @@ const AuthenticationPage = async () => {
                 <div>
                   <p className="font-medium">Análises Inteligentes</p>
                   <p className="text-primary-foreground/70 text-sm">
-                    Visualize tendências e padrões de consumo
+                    Acompanhe receitas e despesas por período e categoria
                   </p>
                 </div>
               </div>
@@ -122,9 +122,9 @@ const AuthenticationPage = async () => {
                 </div>
 
                 <div>
-                  <p className="font-medium">Projeções Financeiras</p>
+                  <p className="font-medium">Contas recorrentes</p>
                   <p className="text-primary-foreground/70 text-sm">
-                    Planeje metas e acompanhe seu crescimento patrimonial
+                    Organize parcelas e vencimentos futuros
                   </p>
                 </div>
               </div>
